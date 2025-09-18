@@ -1,0 +1,456 @@
+{
+  "template_name": "ls_single_label4",
+  "description": "Шаблон для PDF с этикетками. Первая страница имеет особую структуру (одна большая этикетка партии + 4 стандартные). Страницы 2+ содержат сетку 2x4 стандартных этикеток размером 393x825 пикселей.",
+  "page_processing": {
+    "page_1": {
+      "preprocessing": {
+        "crop": {
+          "width": 1654,
+          "height": 1700
+        }
+      },
+      "labels": [
+        {
+          "type": "main_batch",
+          "name": "mane_label",
+          "bbox": {
+            "x": 30,
+            "y": 30,
+            "width": 865,
+            "height": 700
+          }
+        },
+        {
+          "type": "standard_row",
+          "name": "standard_labels_row",
+          "count": 4,
+          "bbox_template": {
+            "width": 393,
+            "height": 825
+          },
+          "layout": {
+            "first_left_margin": 7,
+            "top_margin": 765,
+            "horizontal_spacing": 10
+          }
+        }
+      ]
+    },
+    "page_n": {
+      "preprocessing": {
+        "crop": {
+          "width": 1654,
+          "height": 1730
+        }
+      },
+      "labels": [
+        {
+          "type": "grid",
+          "name": "grid_labels",
+          "bbox_template": {
+            "width": 393,
+            "height": 825
+          },
+          "layout": {
+            "rows": 2,
+            "cols": 4,
+            "left_margin": 8,
+            "top_margin": 23,
+            "horizontal_spacing": 9,
+            "vertical_spacing": 11,
+            "special_left_margins": {
+              "indices": [2, 3, 6, 7],
+              "value": 14
+            }
+          }
+        }
+      ]
+    }
+  },
+  "fields": {
+    "name": {
+      "bbox": [18, 6, 386, 60],
+      "type": "text",
+      "required": true,
+      "max_length": 100,
+      "processor": "name_processor"
+    },
+    "product_code": {
+      "bbox": [175, 65, 272, 83],
+      "type": "text",
+      "required": true,
+      "max_length": 20,
+      "processor": "product_code_processor"
+    },
+    "article": {
+      "bbox": [98, 88, 366, 120],
+      "type": "text",
+      "required": true,
+      "max_length": 50,
+      "processor": "article_processor"
+    },
+    "barcode": {
+      "bbox": [175, 274, 366, 332],
+      "type": "barcode",
+      "required": true,
+      "processor": "barcode_processor"
+    },
+    "size": {
+      "bbox": [84, 130, 301, 196],
+      "type": "text",
+      "required": false,
+      "max_length": 20,
+      "processor": "size_processor"
+    },
+    "color": {
+      "bbox": [131, 249, 323, 267],
+      "type": "text",
+      "required": false,
+      "max_length": 30,
+      "processor": "color_processor"
+    },
+    "compound": {
+      "bbox": [85, 209, 370, 243],
+      "type": "text",
+      "required": false,
+      "max_length": 200,
+      "processor": "compound_processor"
+    },
+    "lot number": {
+      "bbox": [16, 274, 169, 338],
+      "type": "text",
+      "required": false,
+      "max_length": 20,
+      "processor": "quantity_in_box_processor"
+    },
+    "date": {
+      "bbox": [18, 599, 237, 618],
+      "type": "date",
+      "required": true,
+      "format": "DD.MM.YYYY",
+      "processor": "date_processor"
+    },
+    "country_of_manufacture": {
+      "bbox": [14, 580, 332, 602],
+      "type": "text",
+      "required": true,
+      "max_length": 50,
+      "processor": "country_of_manufacture_processor"
+    },
+    "tm": {
+      "bbox": [16, 352, 232, 377],
+      "type": "text",
+      "required": false,
+      "max_length": 50,
+      "processor": "tm_processor"
+    },
+    "barcode_num": {
+      "bbox": [197, 334, 355, 355],
+      "type": "text",
+      "required": false,
+      "max_length": 50,
+      "processor": "barcode_processor"
+    },
+    "manufacturer": {
+      "bbox": [15, 392, 377, 434],
+      "type": "text",
+      "required": false,
+      "max_length": 50,
+      "processor": "manufacturer_processor"
+    },
+    "manufacturer_address": {
+      "bbox": [13, 450, 381, 512],
+      "type": "text",
+      "required": false,
+      "max_length": 100,
+      "processor": "manufacturer_address_processor"
+    },
+    "importer": {
+      "bbox": [12, 500, 290, 523],
+      "type": "text",
+      "required": true,
+      "max_length": 20,
+      "processor": "importer_processor"
+    },
+    "address": {
+      "bbox": [13, 521, 378, 559],
+      "type": "text",
+      "required": true,
+      "max_length": 100,
+      "processor": "importer_address_processor"
+    },
+    "datamatrix": {
+      "bbox": [134, 637, 264, 769],
+      "type": "datamatrix",
+      "required": false,
+      "processor": "datamatrix_processor"
+    },
+    "datamatrix_text": {
+      "bbox": [120, 769, 284, 804],
+      "type": "text",
+      "required": false,
+      "max_length": 50,
+      "processor": "datamatrix_text_processor"
+    }
+  },
+  "page_1_mane_fields": {
+    "name_corob": {
+      "bbox": [15, 10, 685, 61],
+      "type": "text",
+      "required": true,
+      "max_length": 100,
+      "processor": "name_corob_processor"
+    },
+    "code_corob": {
+      "bbox": [308, 67, 523, 90],
+      "type": "text",
+      "required": true,
+      "max_length": 20,
+      "processor": "code_corob_processor"
+    },
+    "article_corob": {
+      "bbox": [242, 98, 655, 123],
+      "type": "text",
+      "required": true,
+      "max_length": 50,
+      "processor": "article_corob_processor"
+    },
+    "size_corob": {
+      "bbox": [245, 137, 657, 184],
+      "type": "text",
+      "required": false,
+      "max_length": 20,
+      "processor": "size_corob_processor"
+    },
+    "color_corob": {
+      "bbox": [327, 190, 575, 216],
+      "type": "text",
+      "required": false,
+      "max_length": 30,
+      "processor": "color_corob_processor"
+    },
+    "quantity_corob": {
+      "bbox": [381, 220, 527, 245],
+      "type": "text",
+      "required": false,
+      "max_length": 20,
+      "processor": "quantity_corob_processor"
+    },
+    "TM_corob": {
+      "bbox": [16, 245, 201, 277],
+      "type": "text",
+      "required": false,
+      "max_length": 50,
+      "processor": "TM_corob_processor"
+    },
+    "manufacturer_corob": {
+      "bbox": [16, 281, 660, 329],
+      "type": "text",
+      "required": false,
+      "max_length": 50,
+      "processor": "manufacturer_corob_processor"
+    },
+    "importer_corob": {
+      "bbox": [16, 402, 391, 433],
+      "type": "text",
+      "required": true,
+      "max_length": 20,
+      "processor": "importer_corob_processor"
+    },
+    "adres_corob": {
+      "bbox": [16, 437, 666, 485],
+      "type": "text",
+      "required": true,
+      "max_length": 100,
+      "processor": "adres_corob_processor"
+    },
+    "country_corob": {
+      "bbox": [16, 533, 329, 562],
+      "type": "text",
+      "required": true,
+      "max_length": 50,
+      "processor": "country_corob_processor"
+    },
+    "date_corob": {
+      "bbox": [346, 529, 630, 564],
+      "type": "date",
+      "required": true,
+      "format": "DD.MM.YYYY",
+      "processor": "date_corob_processor"
+    },
+    "barcode_corob": {
+      "bbox": [98, 573, 532, 657],
+      "type": "barcode",
+      "required": true,
+      "processor": "barcode_corob_processor"
+    },
+    "barcode_text_corob": {
+      "bbox": [91, 656, 494, 686],
+      "type": "text",
+      "required": false,
+      "max_length": 50,
+      "processor": "barcode_text_corob_processor",
+      "whitelist": "0123456789 "
+
+    },
+    "party_corob": {
+      "bbox": [727, 563, 832, 669],
+      "type": "datamatrix",
+      "required": false,
+      "processor": "party_corob_processor"
+    },
+    "matrix_text_corob": {
+      "bbox": [696, 78, 718, 454],
+      "type": "text",
+      "required": false,
+      "max_length": 50,
+      "processor": "matrix_text_corob_processor"
+    },
+    "matrix_corob": {
+      "bbox": [718, 94, 857, 446],
+      "type": "datamatrix",
+      "required": false,
+      "processor": "datamatrix_processor"
+    },
+    "adres_manufacture_corob": {
+      "bbox": [17, 338, 662, 397],
+      "type": "text",
+      "required": false,
+      "max_length": 100,
+      "processor": "adres_manufacture_corob_processor"
+    }
+  },
+  "validation": {
+    "name": {
+      "required": true,
+      "max_length": 100
+    },
+    "product_code": {
+      "required": true,
+      "max_length": 20
+    },
+    "article": {
+      "required": true,
+      "max_length": 50
+    },
+    "barcode": {
+      "required": true
+    },
+    "size": {
+      "required": false,
+      "max_length": 20
+    },
+    "color": {
+      "required": false,
+      "max_length": 30
+    },
+    "compound": {
+      "required": false,
+      "max_length": 200
+    },
+    "lot number": {
+      "required": false,
+      "max_length": 20
+    },
+    "tm": {
+      "required": false,
+      "max_length": 50
+    },
+    "barcode_num": {
+      "required": false,
+      "max_length": 50
+    },
+    "manufacturer": {
+      "required": false,
+      "max_length": 50
+    },
+    "manufacturer_address": {
+      "required": false,
+      "max_length": 100
+    },
+    "importer": {
+      "required": true,
+      "max_length": 20
+    },
+    "address": {
+      "required": true,
+      "max_length": 100
+    },
+    "datamatrix": {
+      "required": false
+    },
+    "datamatrix_text": {
+      "required": false,
+      "max_length": 50
+    },
+    "name_corob": {
+      "required": true,
+      "max_length": 100
+    },
+    "code_corob": {
+      "required": true,
+      "max_length": 20
+    },
+    "article_corob": {
+      "required": true,
+      "max_length": 50
+    },
+    "size_corob": {
+      "required": false,
+      "max_length": 20
+    },
+    "color_corob": {
+      "required": false,
+      "max_length": 30
+    },
+    "quantity_corob": {
+      "required": false,
+      "max_length": 20
+    },
+    "TM_corob": {
+      "required": false,
+      "max_length": 50
+    },
+    "manufacturer_corob": {
+      "required": false,
+      "max_length": 50
+    },
+    "importer_corob": {
+      "required": true,
+      "max_length": 20
+    },
+    "adres_corob": {
+      "required": true,
+      "max_length": 100
+    },
+    "country_corob": {
+      "required": true,
+      "max_length": 50
+    },
+    "date_corob": {
+      "required": true,
+      "format": "DD.MM.YYYY"
+    },
+    "barcode_corob": {
+      "required": true
+    },
+    "barcode_text_corob": {
+      "required": false,
+      "max_length": 50
+    },
+    "party_corob": {
+      "required": false
+    },
+    "matrix_text_corob": {
+      "required": false,
+      "max_length": 50
+    },
+    "matrix_corob": {
+      "required": false
+    },
+    "adres_manufacture_corob": {
+      "required": false,
+      "max_length": 100
+    }
+  }
+}

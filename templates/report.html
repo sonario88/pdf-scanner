@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Отчет о проверке этикеток</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        /* Добавляем CSS для улучшения визуального оформления */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1, h2, h3, h4 {
+            color: #333;
+        }
+        .report-summary {
+            background-color: #e9ecef;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .labels-report {
+            margin-top: 30px;
+        }
+        /* Стиль для карточки этикетки */
+        .label-card {
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 20px;
+            background-color: #fafafa;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        /* Стиль для выделения mane этикетки */
+        .label-card.highlight-mane {
+            border-color: #007bff;
+            background-color: #e6f3ff; /* Светло-синий фон */
+            box-shadow: 0 2px 8px rgba(0,123,255,0.1);
+        }
+        .label-card.highlight-mane h3 {
+            color: #0056b3;
+        }
+        .section {
+            margin-bottom: 15px;
+        }
+        .fields-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        .fields-table th,
+        .fields-table td {
+            padding: 8px 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        .fields-table th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+        .status-ok {
+            color: green;
+            font-weight: bold;
+        }
+        .status-error {
+            color: red;
+            font-weight: bold;
+        }
+        .status-warning {
+            color: orange;
+            font-weight: bold;
+        }
+        .field-message {
+            color: #666;
+            font-size: 0.9em;
+            font-style: italic;
+        }
+        .label-errors {
+            list-style-type: none;
+            padding-left: 0;
+        }
+        .label-errors li {
+            margin-bottom: 5px;
+            padding: 5px;
+            border-radius: 3px;
+        }
+        .label-errors li.status-error {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        .label-errors li.status-warning {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+        }
+        .actions {
+            margin-top: 30px;
+            text-align: center;
+        }
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            margin: 5px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+        }
+        .button:hover {
+            background-color: #0056b3;
+        }
+        .button.secondary {
+            background-color: #6c757d;
+        }
+        .button.secondary:hover {
+            background-color: #545b62;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Отчет о проверке этикеток</h1>
+        
+        <div class="report-summary">
+            <h2>Сводка</h2>
+            <p><strong>Файл:</strong> {{ report.pdf_file }}</p>
+            <p><strong>Шаблон:</strong> {{ report.template_used }}</p>
+            <p><strong>Режим обработки:</strong> {{ report.processing_mode }}</p>
+            <p><strong>Обработано страниц:</strong> {{ report.pages_processed }} из {{ report.total_pages }}</p>
+            <p><strong>Всего этикеток:</strong> {{ report.summary.total_labels }}</p>
+            <p><strong>Этикеток с ошибками:</strong> {{ report.summary.labels_with_errors }}</p>
+        </div>
+
+        <div class="labels-report">
+            <h2>Результаты по этикеткам</h2>
+            {% for page in report.pages %}
+                {% for label in page.labels %}
+                <div class="label-card {% if '_mane' in label.label_id %}highlight-mane{% endif %}">
+                    <h3>Этикетка ID: {{ label.label_id }} (Позиция: {{ label.position }})</h3>
+                    
+                    <!-- Распознанные поля -->
+                    <div class="section">
+                        <h4>Распознанные поля:</h4>
+                        {% if label.text_check.parsed_fields %}
+                        <table class="fields-table">
+                            <thead>
+                                <tr>
+                                    <th>Поле</th>
+                                    <th>Значение</th>
+                                    <th>Статус</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for field_name, field_value in label.text_check.parsed_fields.items() %}
+                                <tr>
+                                    <td>{{ field_name }}</td>
+                                    <td>{{ field_value | default('') }}</td>
+                                    <td>
+                                        <!-- Определяем статус на основе validated_fields_info -->
+                                        {% set field_info_raw = label.text_check.validated_fields_info.get(field_name, {}) %}
+                                        {% set status = field_info_raw.get('status', 'ok') %}
+                                        {% if status == 'ok' %}
+                                            <span class="status-ok">ОК</span>
+                                        {% elif status == 'error' %}
+                                            <span class="status-error">ОШИБКА</span>
+                                        {% elif status == 'warning' %}
+                                            <span class="status-warning">ПРЕДУПРЕЖДЕНИЕ</span>
+                                        {% else %}
+                                            <span class="status-warning">НЕОПРЕДЕЛЕННО</span>
+                                        {% endif %}
+                                        
+                                        <!-- Показываем сообщение только если есть ошибка или предупреждение -->
+                                        {% if status != 'ok' and field_info_raw.get('message') %}
+                                            <div class="field-message">({{ field_info_raw.get('message') }})</div>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        {% else %}
+                        <p>Поля не распознаны.</p>
+                        {% endif %}
+                    </div>
+
+                    <!-- Проверка качества изображения -->
+                    <div class="section">
+                        <h4>Проверка качества изображения:</h4>
+                        <p class="{{ 'status-ok' if label.image_quality_check.passed else 'status-error' }}">
+                            {% if label.image_quality_check.passed %}
+                                OK (Резкость: {{ "%.2f"|format(label.image_quality_check.sharpness) }})
+                            {% else %}
+                                ОШИБКА (Резкость: {{ "%.2f"|format(label.image_quality_check.sharpness) }})
+                            {% endif %}
+                        </p>
+                    </div>
+
+                    <!-- Проверка штрихкодов -->
+                    <div class="section">
+                        <h4>Проверка штрихкодов:</h4>
+                        <p class="{{ 'status-ok' if label.barcode_check.passed else 'status-error' }}">
+                            {% if label.barcode_check.passed %}
+                                OK
+                            {% else %}
+                                ОШИБКА
+                            {% endif %}
+                            - {{ label.barcode_check.details }}
+                        </p>
+                        {% if label.barcode_check.found_codes %}
+                        <ul class="label-errors">
+                            {% for code in label.barcode_check.found_codes %}
+                            <li>
+                                <strong>{{ code.type }}:</strong> {{ code.data }}
+                                <span class="{{ 'status-ok' if code.status == 'OK' else 'status-error' }}">{{ code.status }}</span>
+                                {% if code.error %}
+                                    <span class="field-message">({{ code.error }})</span>
+                                {% endif %}
+                            </li>
+                            {% endfor %}
+                        </ul>
+                        {% endif %}
+                    </div>
+
+                    <!-- Проверка DataMatrix -->
+                    {% if label.datamatrix_cz_check != None %}
+                    <div class="section">
+                        <h4>Проверка DataMatrix:</h4>
+                        <p class="{{ 'status-ok' if label.datamatrix_cz_check.passed else 'status-error' }}">
+                            {% if label.datamatrix_cz_check.passed %}
+                                OK
+                            {% else %}
+                                ОШИБКА
+                            {% endif %}
+                            - {{ label.datamatrix_cz_check.details }}
+                        </p>
+                        {% if label.datamatrix_cz_check.found_codes %}
+                        <ul class="label-errors">
+                            {% for code in label.datamatrix_cz_check.found_codes %}
+                            <li>
+                                <strong>DataMatrix:</strong> {{ code.data }}
+                                <span class="{{ 'status-ok' if code.status == 'OK' else 'status-error' }}">{{ code.status }}</span>
+                                {% if code.error %}
+                                    <span class="field-message">({{ code.error }})</span>
+                                {% endif %}
+                            </li>
+                            {% endfor %}
+                        </ul>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+
+                    <!-- Сводка по ошибкам/предупреждениям -->
+                    <div class="section">
+                        <h4>Сводка ошибок и предупреждений:</h4>
+                        <ul class="label-errors">
+                            <!-- Проверка качества изображения -->
+                            {% if not label.image_quality_check.passed %}
+                            <li class="status-error">ОШИБКА: Низкая резкость изображения ({{ "%.2f"|format(label.image_quality_check.sharpness) }}).</li>
+                            {% endif %}
+
+                            <!-- Проверка штрихкодов -->
+                            {% if not label.barcode_check.passed %}
+                            <li class="status-error">ОШИБКА: Ошибка при проверке штрихкодов: {{ label.barcode_check.details }}.</li>
+                            {% endif %}
+
+                            <!-- Проверка DataMatrix -->
+                            {% if label.datamatrix_cz_check != None and not label.datamatrix_cz_check.passed %}
+                            <li class="status-error">ОШИБКА: Ошибка при проверке DataMatrix: {{ label.datamatrix_cz_check.details }}.</li>
+                            {% endif %}
+
+                            <!-- Проверка полей -->
+                            {% for field_name, field_info in label.text_check.validated_fields_info.items() %}
+                                {% if field_info.status == 'error' %}
+                                <li class="status-error">ОШИБКА: Поле "{{ field_name }}" имеет ошибку: {{ field_info.message }}.</li>
+                                {% elif field_info.status == 'warning' %}
+                                <li class="status-warning">ПРЕДУПРЕЖДЕНИЕ: Поле "{{ field_name }}" имеет предупреждение: {{ field_info.message }}.</li>
+                                {% endif %}
+                            {% endfor %}
+                        </ul>
+                        {% set overall_passed = (
+                            label.image_quality_check.passed and
+                            label.barcode_check.passed and
+                            (label.datamatrix_cz_check is none or label.datamatrix_cz_check.passed) and
+                            not (label.text_check.validated_fields_info | selectattr('status', 'equalto', 'error') | list | length > 0)
+                        ) %}
+                        {% if overall_passed %}
+                            <p class="status-ok">Нет критических ошибок.</p>
+                        {% else %}
+                            <p class="status-error">Есть критические ошибки.</p>
+                        {% endif %}
+                    </div>
+
+                </div>
+                {% endfor %}
+            {% endfor %}
+        </div>
+
+        <div class="actions">
+            <a href="{{ url_for('download_file', filename=report_filename) }}" class="button">Скачать отчет (JSON)</a>
+            <a href="/" class="button secondary">Назад к загрузке</a>
+        </div>
+    </div>
+</body>
+</html>

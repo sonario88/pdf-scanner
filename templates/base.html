@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Проверка этикеток{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header>
+        <h1>Система проверки этикеток</h1>
+    </header>
+    
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+    
+    <!-- Футер удален -->
+    
+    <script>
+        // Функция для AJAX-запроса на очистку папок удалена
+    </script>
+    
+    {% block scripts %}{% endblock %}
+</body>
+</html>

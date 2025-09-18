@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block title %}Разделение завершено{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2>Разделение этикеток завершено</h2>
+    
+    <div class="info-message">
+        <p>Этикетки были успешно извлечены из PDF-файла и сохранены в папке.</p>
+        <p>Вы можете скачать архив со всеми извлеченными этикетками.</p>
+    </div>
+    
+    <div class="actions">
+        <a href="/" class="button">Назад к загрузке</a>
+        <a href="/download_labels_zip" class="button">Скачать ZIP со всеми этикетками</a>
+    </div>
+</div>
+{% endblock %}

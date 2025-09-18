@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block title %}Загрузка PDF{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2>Загрузка PDF-файла с этикетками</h2>
+    
+    <form id="uploadForm" action="/upload" method="post" enctype="multipart/form-data">
+        <div class="form-group">
+            <label for="file">Выберите PDF-файл:</label>
+            <input type="file" id="file" name="file" accept=".pdf" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="template">Выберите шаблон обработки:</label>
+            <select id="template" name="template" required>
+                {% for template in templates %}
+                    <option value="{{ template }}">{{ template }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label>Режим обработки:</label>
+            {% for mode_key, mode_label in processing_modes.items() %}
+                <div>
+                    <input type="radio" id="mode_{{ mode_key }}" name="processing_mode" value="{{ mode_key }}" 
+                           {% if mode_key == 'all' %}checked{% endif %}>
+                    <label for="mode_{{ mode_key }}">{{ mode_label }}</label>
+                </div>
+            {% endfor %}
+        </div>
+        
+        <div class="form-group" id="specific_pages_group" style="display: none;">
+            <label for="specific_pages">Номера страниц (через запятую, например: 1,3,5):</label>
+            <input type="text" id="specific_pages" name="specific_pages">
+        </div>
+        
+        <div class="form-group" id="page_range_group" style="display: none;">
+            <label for="page_range_start">С страницы:</label>
+            <input type="number" id="page_range_start" name="page_range_start" min="1">
+            <label for="page_range_end">По страницу:</label>
+            <input type="number" id="page_range_end" name="page_range_end" min="1">
+        </div>
+        
+        <div class="form-group">
+            <input type="checkbox" id="split_only" name="split_only">
+            <label for="split_only">Разъединить этикетки (без OCR и проверок)</label>
+        </div>
+        
+        <button type="submit">Загрузить и обработать</button>
+    </form>
+    
+    <!-- Кнопка очистки удалена -->
+    <!-- Кнопка скачивания ZIP удалена -->
+</div>
+
+<script>
+    // Показ/скрытие полей в зависимости от выбранного режима обработки
+    document.addEventListener('DOMContentLoaded', function() {
+        const modeRadios = document.querySelectorAll('input[name="processing_mode"]');
+        const specificPagesGroup = document.getElementById('specific_pages_group');
+        const pageRangeGroup = document.getElementById('page_range_group');
+        
+        function toggleProcessingOptions() {
+            const selectedMode = document.querySelector('input[name="processing_mode"]:checked').value;
+            
+            specificPagesGroup.style.display = selectedMode === 'specific' ? 'block' : 'none';
+            pageRangeGroup.style.display = selectedMode === 'range' ? 'block' : 'none';
+        }
+        
+        modeRadios.forEach(radio => {
+            radio.addEventListener('change', toggleProcessingOptions);
+        });
+        
+        // Инициализация при загрузке страницы
+        toggleProcessingOptions();
+    });
+</script>
+{% endblock %}
